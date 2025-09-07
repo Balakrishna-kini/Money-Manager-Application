@@ -1,18 +1,24 @@
-# Use official OpenJDK 21 image
-FROM eclipse-temurin:21-jdk-alpine
+# Use full Java 21 JDK (not Alpine) to avoid Maven build issues
+FROM eclipse-temurin:21-jdk
 
+# Set working directory
 WORKDIR /app
 
-# Copy pom.xml and source
-COPY pom.xml ./
+# Copy Maven wrapper and pom.xml
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
+
+# Copy source code
 COPY src ./src
 
-# Install Maven
-RUN apk add --no-cache maven
+# Make Maven wrapper executable
+RUN chmod +x mvnw
 
-# Build project using system Maven
-RUN mvn clean package -DskipTests
+# Build the project using Maven wrapper, skip tests
+RUN ./mvnw clean package -DskipTests
 
+# Expose the port (Render will assign $PORT)
 EXPOSE 8080
 
+# Run the Spring Boot application
 CMD ["java", "-Dserver.port=$PORT", "-Dspring.profiles.active=prod", "-jar", "target/*.jar"]
