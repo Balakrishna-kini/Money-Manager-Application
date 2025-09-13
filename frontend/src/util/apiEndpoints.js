@@ -1,4 +1,4 @@
-export const BASE_URL = "http://https://money-manager-application-backend.onrender.com/api/v1.0";
+export const BASE_URL = "https://money-manager-application-backend.onrender.com/api/v1.0";
 const CLOUDINARY_CLOUD_NAME = "dhadf5h7j";
 
 export const API_ENDPOINTS = {
