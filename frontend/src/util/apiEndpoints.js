@@ -1,10 +1,11 @@
-export const BASE_URL = process.env.REACT_APP_API_URL;
+export const BASE_URL = process.env.REACT_APP_API_URL;  
+// Example: "https://money-manager-application-backend.onrender.com/api/v1.0"
 
 const CLOUDINARY_CLOUD_NAME = "dhadf5h7j";
 
 export const API_ENDPOINTS = {
-    LOGIN: "/login",
-    REGISTER: "/register",
+    LOGIN: "/auth/login",          // fixed
+    REGISTER: "/auth/register",    // fixed
     GET_USER_INFO: "/profile",
     GET_ALL_CATEGORIES: "/categories",
     ADD_CATEGORY: "/categories",
@@ -13,14 +14,14 @@ export const API_ENDPOINTS = {
     CATEGORY_BY_TYPE: (type) => `/categories/${type}`,
     ADD_INCOME: "/incomes",
     DELETE_INCOME: (incomeId) => `/incomes/${incomeId}`,
-    INCOME_EXCEL_DOWNLOAD: "excel/download/income",
+    INCOME_EXCEL_DOWNLOAD: "/excel/download/income",   // add leading slash
     EMAIL_INCOME: "/email/income-excel",
     GET_ALL_EXPENSE: "/expenses",
     ADD_EXPENSE: "/expenses",
     DELETE_EXPENSE: (expenseId) => `/expenses/${expenseId}`,
-    EXPENSE_EXCEL_DOWNLOAD: "excel/download/expense",
+    EXPENSE_EXCEL_DOWNLOAD: "/excel/download/expense", // add leading slash
     EMAIL_EXPENSE: "/email/expense-excel",
     APPLY_FILTERS: "/filter",
     DASHBOARD_DATA: "/dashboard",
     UPLOAD_IMAGE: `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`
-}
+};
