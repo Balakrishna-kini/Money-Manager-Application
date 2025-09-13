@@ -4,8 +4,8 @@ export const BASE_URL = "https://money-manager-application-backend.onrender.com/
 const CLOUDINARY_CLOUD_NAME = "dhadf5h7j";
 
 export const API_ENDPOINTS = {
-    LOGIN: "/auth/login",          // fixed
-    REGISTER: "/auth/register",    // fixed
+    LOGIN: "/login",          
+    REGISTER: "/register",    
     GET_USER_INFO: "/profile",
     GET_ALL_CATEGORIES: "/categories",
     ADD_CATEGORY: "/categories",
