@@ -1,5 +1,6 @@
+// Temporarily pointing to local backend for testing
 export const BASE_URL = "https://money-manager-application-backend.onrender.com/api/v1.0";
-// Example: "https://money-manager-application-backend.onrender.com/api/v1.0"
+// Original remote URL: "https://money-manager-application-backend.onrender.com/api/v1.0"
 
 const CLOUDINARY_CLOUD_NAME = "dhadf5h7j";
 
