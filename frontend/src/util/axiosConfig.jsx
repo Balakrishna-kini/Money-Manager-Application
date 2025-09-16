@@ -10,7 +10,7 @@ const axiosConfig = axios.create({
 });
 
 //list of endpoints that do not required authorization header
-const excludeEndpoints = ["/login", "/register", "/status", "/activate", "/health"];
+const excludeEndpoints = ["/auth/login", "/auth/register", "/status", "/activate", "/health"];
 
 //request interceptor
 axiosConfig.interceptors.request.use((config) => {
