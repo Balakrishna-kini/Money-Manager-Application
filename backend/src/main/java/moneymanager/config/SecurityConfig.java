@@ -34,12 +34,16 @@ public class SecurityConfig {
         httpSecurity.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Explicitly permit auth endpoints
                         .requestMatchers(
                                 "/status",
                                 "/health",
-                                "/api/v1.0/auth/**"
+                                "/api/v1.0/auth/register",
+                                "/api/v1.0/auth/login",
+                                "/api/v1.0/auth/profile"
                         ).permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
@@ -54,7 +58,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Explicitly allow your Netlify frontend
+        // Explicitly allow your Netlify frontend
         configuration.setAllowedOrigins(List.of(
                 "https://moneymanagerui.netlify.app",
                 "https://68c97fd2cebe8314f6cfa5da--moneymanagerui.netlify.app" // preview URL
