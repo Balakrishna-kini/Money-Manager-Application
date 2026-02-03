@@ -1,13 +1,7 @@
 package moneymanager.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,24 +15,32 @@ public class ProfileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String fullName;
-    @Column(unique = true)
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String password;
+
     private String profileImageUrl;
-    @Column(updatable = false)
-    @CreationTimestamp
+
+    private Boolean isActive; // set true by default
+
     private LocalDateTime createdAt;
-    @UpdateTimestamp
+
     private LocalDateTime updatedAt;
-    private Boolean isActive;
-    private String activationToken;
 
     @PrePersist
-    public void prePersist() {
-        if (this.isActive == null) {
-            isActive = false;
-        }
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        if (isActive == null)
+            isActive = true;
     }
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -29,26 +29,22 @@ public class SecurityConfig {
     private final AppUserDetailsService appUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
 
+    // In SecurityConfig.java
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Explicitly permit auth endpoints
-                        .requestMatchers(
-                                "/status",
-                                "/health",
-                                "/api/v1.0/auth/register",
-                                "/api/v1.0/auth/login",
-                                "/api/v1.0/auth/profile"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                        // Explicitly permit public endpoints
+                        .requestMatchers("/auth/register", "/auth/login", "/status", "/health")
+                        .permitAll()
+                        // Secure all other requests
+                        .anyRequest().authenticated())
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -57,17 +53,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Explicitly allow your Netlify frontend
-        configuration.setAllowedOrigins(List.of(
-                "https://moneymanagerui.netlify.app",
-                "https://68c97fd2cebe8314f6cfa5da--moneymanagerui.netlify.app" // preview URL
-        ));
-
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Add your deployed frontend URL if used
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

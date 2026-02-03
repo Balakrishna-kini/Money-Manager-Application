@@ -11,35 +11,35 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/auth")
 @RequiredArgsConstructor
-@RequestMapping("/api/v1.0/auth") // ADDED THIS LINE TO FIX THE 404 ERROR
 public class ProfileController {
 
     private final ProfileService profileService;
 
+    // ✅ Register and return JWT
     @PostMapping("/register")
-    public ResponseEntity<ProfileDTO> registerProfile(@RequestBody ProfileDTO profileDTO) {
+    public ResponseEntity<Map<String, Object>> registerProfile(@RequestBody ProfileDTO profileDTO) {
         ProfileDTO registeredProfile = profileService.registerProfile(profileDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
+
+        AuthDTO authDTO = new AuthDTO();
+        authDTO.setEmail(registeredProfile.getEmail());
+        authDTO.setPassword(profileDTO.getPassword()); // raw password for login
+
+        Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Activation endpoint removed as users are now activated immediately upon registration
-
+    // ✅ Login
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
-        try {
-            // Account activation check removed as users are now activated immediately
-            Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                    "message", e.getMessage()
-            ));
-        }
+        Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
+        return ResponseEntity.ok(response);
     }
 
+    // ✅ Get current profile
     @GetMapping("/profile")
-    public ResponseEntity<ProfileDTO> getPublicProfile() {
+    public ResponseEntity<ProfileDTO> getCurrentProfile() {
         ProfileDTO profileDTO = profileService.getPublicProfile(null);
         return ResponseEntity.ok(profileDTO);
     }

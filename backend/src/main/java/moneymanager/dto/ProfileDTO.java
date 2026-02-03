@@ -14,10 +14,18 @@ import java.time.LocalDateTime;
 public class ProfileDTO {
 
     private Long id;
+
     private String fullName;
+
     private String email;
+
+    // Only use password when registering or updating; never return it in API
+    // responses
     private String password;
+
     private String profileImageUrl;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 }
