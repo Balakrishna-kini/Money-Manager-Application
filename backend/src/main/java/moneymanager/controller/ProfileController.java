@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1.0/auth") // Combined with endpoints below, matches frontend exactly
+@RequestMapping("/auth") 
 @RequiredArgsConstructor
 public class ProfileController {
 
