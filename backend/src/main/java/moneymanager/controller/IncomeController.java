@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/incomes")
+@RequestMapping("/api/v1.0/incomes")
 public class IncomeController {
 
     private final IncomeService incomeService;

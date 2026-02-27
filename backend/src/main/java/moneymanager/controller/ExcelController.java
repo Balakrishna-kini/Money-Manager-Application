@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/excel")
+@RequestMapping("/api/v1.0/excel")
 @RequiredArgsConstructor
 public class ExcelController {
 
