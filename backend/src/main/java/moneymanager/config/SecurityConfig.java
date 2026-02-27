@@ -39,7 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // Permit the versioned auth endpoints
-                .requestMatchers("/api/v1.0/auth/**").permitAll() 
+                .requestMatchers("/auth/**").permitAll() 
                 .requestMatchers("/status", "/health").permitAll()
                 .anyRequest().authenticated()
             )
