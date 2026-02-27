@@ -1,5 +1,5 @@
 import axios from "axios";
-import {BASE_URL} from "./apiEndpoints.js";
+import { BASE_URL } from "./apiEndpoints.js";
 
 const axiosConfig = axios.create({
     baseURL: BASE_URL,
@@ -9,18 +9,22 @@ const axiosConfig = axios.create({
     }
 });
 
-// In axiosConfig.jsx
+// Use exact paths or simpler checks
 const excludeEndpoints = ["/auth/login", "/auth/register", "/status", "/health"];
-//request interceptor
+
 axiosConfig.interceptors.request.use((config) => {
-    const shouldSkipToken = excludeEndpoints.some((endpoint) => {
-        return config.url?.includes(endpoint)
-    });
+    // 1. Improved check: ensure we handle undefined urls
+    const url = config.url || "";
+    const shouldSkipToken = excludeEndpoints.some((endpoint) => url.includes(endpoint));
 
     if (!shouldSkipToken) {
-        const accessToken = localStorage.getItem("token");
+        // 2. Fix: localStorage sometimes stores strings with extra quotes
+        let accessToken = localStorage.getItem("token");
+        
         if (accessToken) {
-            config.headers.Authorization = `Bearer ${accessToken}`;
+            // Remove extra quotes if they exist (common with JSON.stringify)
+            const cleanToken = accessToken.replace(/^"(.*)"$/, '$1');
+            config.headers.Authorization = `Bearer ${cleanToken}`;
         }
     }
     return config;
@@ -28,20 +32,22 @@ axiosConfig.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-//response interceptor
 axiosConfig.interceptors.response.use((response) => {
     return response;
 }, (error) => {
-    if(error.response) {
-        if (error.response.status === 401) {
+    if (error.response) {
+        // 3. Handle 403 as well as 401
+        // Often, if a token is expired or wrong, Spring returns 403
+        if (error.response.status === 401 || error.response.status === 403) {
+            localStorage.removeItem("token"); // Clear bad token
             window.location.href = "/login";
         } else if (error.response.status === 500) {
             console.error("Server error. Please try again later");
         }
-    } else if(error.code === "ECONNABORTED") {
+    } else if (error.code === "ECONNABORTED") {
         console.error("Request timeout. Please try again.");
     }
     return Promise.reject(error);
-})
+});
 
 export default axiosConfig;
