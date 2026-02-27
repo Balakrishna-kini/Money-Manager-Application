@@ -33,16 +33,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Permit the versioned auth endpoints
-                .requestMatchers("/auth/**").permitAll() 
-                .requestMatchers("/status", "/health").permitAll()
-                .anyRequest().authenticated()
-            )
+       http
+    .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    .csrf(AbstractHttpConfigurer::disable)
+    .authorizeHttpRequests(auth -> auth
+        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+        .requestMatchers("/status", "/health").permitAll()
+        .anyRequest().authenticated()
+    )
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
