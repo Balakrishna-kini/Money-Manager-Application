@@ -31,7 +31,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String uri = request.getRequestURI();
 
-        // ✅ 1. Skip logic for OPTIONS and Auth endpoints immediately
+        // ✅ Skip filter for OPTIONS and Auth endpoints (includes /api/v1.0/auth/...)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod()) || uri.contains("/auth/")) {
             filterChain.doFilter(request, response);
             return;
@@ -41,33 +41,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String email = null;
         String jwt = null;
 
-        // ✅ 2. Extract JWT from Header
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
-            try {
-                email = jwtUtil.extractUsername(jwt);
-            } catch (Exception e) {
-                // If token is malformed, we just let it fail naturally at the next step
-                logger.error("Could not extract username from token", e);
-            }
+            email = jwtUtil.extractUsername(jwt);
         }
 
-        // ✅ 3. Validate and Set Security Context
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
-
+                                userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }

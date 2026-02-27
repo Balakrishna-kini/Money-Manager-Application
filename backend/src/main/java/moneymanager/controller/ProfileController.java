@@ -11,33 +11,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1.0/auth") // Combined with endpoints below, matches frontend exactly
 @RequiredArgsConstructor
 public class ProfileController {
 
     private final ProfileService profileService;
 
-    // ✅ Register and return JWT
+    // ✅ POST: /api/v1.0/auth/register
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> registerProfile(@RequestBody ProfileDTO profileDTO) {
         ProfileDTO registeredProfile = profileService.registerProfile(profileDTO);
 
         AuthDTO authDTO = new AuthDTO();
         authDTO.setEmail(registeredProfile.getEmail());
-        authDTO.setPassword(profileDTO.getPassword()); // raw password for login
+        authDTO.setPassword(profileDTO.getPassword()); 
 
         Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ✅ Login
+    // ✅ POST: /api/v1.0/auth/login
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody AuthDTO authDTO) {
         Map<String, Object> response = profileService.authenticateAndGenerateToken(authDTO);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Get current profile
+    // ✅ GET: /api/v1.0/auth/profile
     @GetMapping("/profile")
     public ResponseEntity<ProfileDTO> getCurrentProfile() {
         ProfileDTO profileDTO = profileService.getPublicProfile(null);

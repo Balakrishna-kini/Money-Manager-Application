@@ -37,17 +37,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                // 1. Always allow Preflight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // 2. Allow all Auth endpoints (Register/Login) regardless of versioning
-                .requestMatchers("/api/v1.0/auth/**").permitAll()
-                .requestMatchers("/auth/**").permitAll() 
-
-                // 3. Public health checks
+                // Permit the versioned auth endpoints
+                .requestMatchers("/api/v1.0/auth/**").permitAll() 
                 .requestMatchers("/status", "/health").permitAll()
-
-                // 4. Everything else requires a valid JWT
                 .anyRequest().authenticated()
             )
             .sessionManagement(session ->
