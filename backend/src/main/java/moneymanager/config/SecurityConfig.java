@@ -38,10 +38,15 @@ public class SecurityConfig {
     .csrf(AbstractHttpConfigurer::disable)
     .authorizeHttpRequests(auth -> auth
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+
+        // allow auth endpoints (local + render proxy safe)
+        .requestMatchers("/auth/**").permitAll()
+        .requestMatchers("/api/v1.0/auth/**").permitAll()
+
         .requestMatchers("/status", "/health").permitAll()
+
         .anyRequest().authenticated()
+
     )
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
