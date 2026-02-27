@@ -33,71 +33,53 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-
             .authorizeHttpRequests(auth -> auth
-                    // allow preflight
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                // 1. Always allow Preflight OPTIONS requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                    // PUBLIC AUTH APIs
-                    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                // 2. Allow all Auth endpoints (Register/Login) regardless of versioning
+                .requestMatchers("/api/v1.0/auth/**").permitAll()
+                .requestMatchers("/auth/**").permitAll() 
 
-                    // health endpoints
-                    .requestMatchers("/status", "/health").permitAll()
+                // 3. Public health checks
+                .requestMatchers("/status", "/health").permitAll()
 
-                    // everything else secured
-                    .anyRequest().authenticated()
+                // 4. Everything else requires a valid JWT
+                .anyRequest().authenticated()
             )
-
             .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
-            .addFilterBefore(jwtRequestFilter,
-                    UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // ✅ CORS for local + production frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-
         CorsConfiguration configuration = new CorsConfiguration();
-
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://moneymanagerui.netlify.app"
         ));
-
-        configuration.setAllowedMethods(List.of(
-                "GET", "POST", "PUT", "DELETE", "OPTIONS"
-        ));
-
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        DaoAuthenticationProvider provider =
-                new DaoAuthenticationProvider();
-
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(appUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
-
         return new ProviderManager(provider);
     }
 
