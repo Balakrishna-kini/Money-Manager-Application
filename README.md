@@ -1,6 +1,6 @@
 # Money Manager Application
 
-## What is Money Manager?
+## What is Money Manager ?
 
 Money Manager is a simple application that helps you track your personal finances. You can record your income and expenses, organize them into categories, and see your financial status at a glance.
 
